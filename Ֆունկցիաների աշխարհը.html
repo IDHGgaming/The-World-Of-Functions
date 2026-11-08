@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="hy">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ֆունկցիաների աշխարհը</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Armenian:wght@400;600;800&family=Noto+Serif+Armenian:wght@600;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#10162b;--panel:#1a2240;--line:#2e3a66;--text:#eef1ff;--mute:#a4aed3;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f3f5fc;--panel:#fff;--line:#cfd6ee;--text:#14193a;--mute:#4a547d}}
+:root[data-theme="light"]{--bg:#f3f5fc;--panel:#fff;--line:#cfd6ee;--text:#14193a;--mute:#4a547d}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:70px}
+body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.7 "Noto Sans Armenian",system-ui,sans-serif;
+background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:44px 44px;background-attachment:fixed}
+body::before{content:"";position:fixed;inset:0;background:var(--bg);opacity:.86;z-index:-1}
+h1,h2{font-family:"Noto Serif Armenian",Georgia,serif;margin:0;line-height:1.15}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+nav{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;gap:8px;overflow-x:auto;padding:10px 20px}
+nav a{white-space:nowrap;color:var(--text);text-decoration:none;padding:6px 14px;border-radius:99px;border:1px solid var(--line);font-size:15px}
+nav a:hover,nav a:focus-visible{background:var(--c);border-color:var(--c);color:#10162b;outline:none}
+.hero{padding:64px 0 56px;display:grid;grid-template-columns:1.1fr 1fr;gap:32px;align-items:center}
+.hero h1{font-size:clamp(38px,6vw,68px);font-weight:800}
+.hero p{color:var(--mute);max-width:46ch;font-size:19px}
+.hero .tag{display:inline-block;margin-top:6px;padding:4px 14px;border-radius:99px;background:var(--panel);border:1px solid var(--line);font-weight:600}
+.hero svg{width:100%;height:auto;background:var(--panel);border:1px solid var(--line);border-radius:18px}
+section.fn{padding:56px 0;border-top:1px solid var(--line)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+.fn h2{font-size:clamp(30px,4.5vw,46px);color:var(--c)}
+.fn .en{color:var(--mute);margin:2px 0 14px}
+.formula{display:inline-block;font:600 26px/1.3 "Cambria Math",Georgia,serif;font-style:italic;padding:8px 18px;border-radius:12px;border:2px solid var(--c);margin:6px 0 16px}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:18px 0}
+.facts div{background:var(--panel);border-left:4px solid var(--c);padding:8px 14px;border-radius:0 10px 10px 0;font-size:15px}
+.facts b{display:block;color:var(--mute);font-weight:600;font-size:13px}
+ul{padding-left:20px;margin:10px 0}li{margin:6px 0}li::marker{color:var(--c)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:14px;position:sticky;top:76px}
+.card svg{width:100%;height:auto;display:block}
+.live{font:600 20px Georgia,serif;font-style:italic;color:var(--c);text-align:center;margin:8px 0 4px}
+label{display:grid;grid-template-columns:34px 1fr 44px;gap:8px;align-items:center;font-size:15px;margin:4px 0}
+label span:last-child{text-align:right;color:var(--mute)}
+input[type=range]{width:100%;accent-color:var(--c)}
+footer{padding:40px 0 56px;color:var(--mute);text-align:center;border-top:1px solid var(--line)}
+@media(max-width:820px){.hero,.row{grid-template-columns:1fr}.card{position:static}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav><div class="wrap" id="nav"></div></nav>
+<header class="wrap hero">
+ <div>
+  <h1>Ֆունկցիաների աշխարհը</h1>
+  <p>Վեց հիմնական ֆունկցիա՝ բանաձև, գրաֆիկ և հատկություններ։ Տեղաշարժիր սահողները և տես, թե ինչպես է փոխվում գրաֆիկը։</p>
+  <span class="tag" id="htag"></span>
+ </div>
+ <svg id="hero" viewBox="0 0 400 300" role="img" aria-label="Ֆունկցիաների գրաֆիկներ"></svg>
+</header>
+<main id="main"></main>
+<footer>Սովորիր, փորձիր, հասկացիր։</footer>
+<script>
+const R='Բոլոր իրական թվերը';
+const n=v=>(+v).toFixed(1).replace(/\.0$/,'').replace('-','−');
+const sg=v=>(v<0?'− ':'+ ')+n(Math.abs(v));
+const F=[
+{id:'linear',c:'#4fd1ff',name:'Գծային',en:'Linear',formula:'y = kx + b',
+ f:(x,p)=>p.k*x+p.b,live:p=>`y = ${n(p.k)}x ${sg(p.b)}`,
+ P:[['k',-5,5,1],['b',-8,8,2]],
+ dom:R,ran:R+' (երբ k ≠ 0)',gr:'Ուղիղ գիծ',
+ txt:'Ամենապարզ ֆունկցիան։ Փոփոխականի յուրաքանչյուր մեծացման հետ y-ը փոխվում է միևնույն չափով։',
+ li:['k-ն թեքության գործակիցն է. որքան մեծ է |k|-ն, այնքան գիծը զառիթափ է։','b-ն ցույց է տալիս, թե y առանցքը որ կետում է հատվում՝ (0; b)։','k > 0 դեպքում ֆունկցիան աճում է, k < 0 դեպքում՝ նվազում, իսկ k = 0 դեպքում գրաֆիկը հորիզոնական ուղիղ է։']},
+{id:'quad',c:'#ffb84d',name:'Քառակուսային',en:'Quadratic',formula:'y = ax² + bx + c',
+ f:(x,p)=>p.a*x*x+p.b*x+p.c,live:p=>`y = ${n(p.a)}x² ${sg(p.b)}x ${sg(p.c)}`,
+ P:[['a',-3,3,1],['b',-6,6,0],['c',-8,8,-2]],
+ dom:R,ran:'Կախված է a-ից և գագաթից',gr:'Պարաբոլ',
+ txt:'Գրաֆիկը պարաբոլ է։ Այն նկարագրում է նետված գնդակի հետագիծը, կամարների ու հայելիների ձևը։',
+ li:['a ≠ 0։ Եթե a > 0, ճյուղերը ուղղված են վերև, եթե a < 0՝ ներքև։','Գագաթի աբսցիսը x = −b / (2a) է։','Արմատների թիվը կախված է տարբերակիչից՝ D = b² − 4ac։ D > 0՝ երկու արմատ, D = 0՝ մեկ, D < 0՝ արմատ չկա։']},
+{id:'inv',c:'#ff6b8b',name:'Հակադարձ համեմատականություն',en:'Inverse proportionality',formula:'y = k / x',
+ f:(x,p)=>p.k/x,live:p=>`y = ${n(p.k)} / x`,
+ P:[['k',-8,8,4]],
+ dom:'x ≠ 0',ran:'y ≠ 0',gr:'Հիպերբոլ',
+ txt:'Երբ մեկ մեծությունը մեծանում է, մյուսը նույն անգամ փոքրանում է։ Օրինակ՝ նույն ճանապարհը արագ անցնելիս ժամանակը քիչ է պահանջվում։',
+ li:['x-ի և y-ի արտադրյալը հաստատուն է՝ xy = k։','Կոորդինատային առանցքները գրաֆիկի ասիմպտոտներն են. գրաֆիկը նրանց մոտենում է, բայց երբեք չի հատում։','k > 0 դեպքում ճյուղերը I և III քառորդներում են, k < 0 դեպքում՝ II և IV։']},
+{id:'sqrt',c:'#7dff9b',name:'Քառակուսի արմատ',en:'Square root',formula:'y = √x',
+ f:(x,p)=>x<0?NaN:p.a*Math.sqrt(x),live:p=>`y = ${n(p.a)}√x`,
+ P:[['a',-3,3,1]],
+ dom:'x ≥ 0',ran:'y ≥ 0 (երբ a = 1)',gr:'Պարաբոլի կեսը',
+ txt:'Քառակուսի բարձրացնելու հակադարձ գործողությունն է։ Գրաֆիկը սկսվում է սկզբնակետից և շարժվում դեպի աջ։',
+ li:['Սահմանված է միայն ոչ բացասական թվերի համար։','Ֆունկցիան աճող է, բայց աճը դանդաղում է։','Գրաֆիկը y = x² պարաբոլի աջ ճյուղի արտացոլումն է y = x ուղղի նկատմամբ։','Այստեղ a սահողը ձգում կամ շրջում է գրաֆիկը՝ y = a√x։']},
+{id:'abs',c:'#c58bff',name:'Մոդուլ',en:'Absolute value',formula:'y = |x|',
+ f:(x,p)=>p.a*Math.abs(x),live:p=>`y = ${n(p.a)}|x|`,
+ P:[['a',-3,3,1]],
+ dom:R,ran:'y ≥ 0 (երբ a = 1)',gr:'V տառի նման անկյուն',
+ txt:'Թվի մոդուլը նրա հեռավորությունն է զրոյից թվային առանցքի վրա, ուստի այն երբեք բացասական չէ։',
+ li:['x ≥ 0 դեպքում |x| = x, իսկ x < 0 դեպքում |x| = −x։','Զույգ ֆունկցիա է. գրաֆիկը սիմետրիկ է y առանցքի նկատմամբ։','Գագաթը գտնվում է սկզբնակետում (0; 0)։','Այստեղ a սահողը փոխում է անկյան բացվածքը՝ y = a|x|։']},
+{id:'cubic',c:'#ffe14d',name:'Խորանարդային',en:'Cubic',formula:'y = x³',
+ f:(x,p)=>p.a*x*x*x,live:p=>`y = ${n(p.a)}x³`,
+ P:[['a',-3,3,1]],
+ dom:R,ran:R,gr:'Խորանարդային պարաբոլ',
+ txt:'x-ը երեք անգամ իր վրա բազմապատկելով ստացվում է խորանարդ։ Գրաֆիկը զրոյի մոտ հարթվում է, հետո արագ թռչում վերև կամ ներքև։',
+ li:['Կենտ ֆունկցիա է. գրաֆիկը սիմետրիկ է սկզբնակետի նկատմամբ։','Ֆունկցիան աճող է ամբողջ թվային առանցքի վրա։','Բացասական x-ի դեպքում արժեքը բացասական է, դրականի դեպքում՝ դրական։','Այստեղ a սահողը ձգում կամ շրջում է գրաֆիկը՝ y = ax³։']}
+];
+const NS='http://www.w3.org/2000/svg';
+function path(f,p,X,Y){let d='',pen=false;for(let i=0;i<=700;i++){const x=-10+i*20/700,y=f(x,p);
+ if(!isFinite(y)||Math.abs(y)>60){pen=false;continue}
+ d+=(pen?'L':'M')+(X(x)).toFixed(1)+' '+(Y(y)).toFixed(1);pen=true}return d}
+function frame(W,H,m){const X=x=>W/2+x*W/(2*m),Y=y=>H/2-y*H/(2*m);let s='';
+ for(let t=-m;t<=m;t+=2){s+=`<line x1="${X(t)}" y1="0" x2="${X(t)}" y2="${H}" stroke="var(--line)" stroke-width="${t?1:2.4}"/><line x1="0" y1="${Y(t)}" x2="${W}" y2="${Y(t)}" stroke="var(--line)" stroke-width="${t?1:2.4}"/>`;
+  if(t)s+=`<text x="${X(t)}" y="${Y(0)+14}" font-size="10" fill="var(--mute)" text-anchor="middle">${t}</text><text x="${X(0)-5}" y="${Y(t)+3}" font-size="10" fill="var(--mute)" text-anchor="end">${t}</text>`}
+ return {X,Y,s}}
+const nav=document.getElementById('nav'),main=document.getElementById('main');
+F.forEach(o=>{
+ const p={};o.P.forEach(a=>p[a[0]]=a[3]);
+ nav.insertAdjacentHTML('beforeend',`<a href="#${o.id}" style="--c:${o.c}">${o.name}</a>`);
+ main.insertAdjacentHTML('beforeend',`<section class="fn" id="${o.id}" style="--c:${o.c}"><div class="wrap row">
+ <div><h2>${o.name}</h2><div class="en">${o.en}</div><div class="formula">${o.formula}</div><p>${o.txt}</p>
+ <div class="facts"><div><b>Սահմանման տիրույթ</b>${o.dom}</div><div><b>Արժեքների բազմություն</b>${o.ran}</div><div><b>Գրաֆիկը</b>${o.gr}</div></div>
+ <ul>${o.li.map(t=>`<li>${t}</li>`).join('')}</ul></div>
+ <div class="card"><svg viewBox="0 0 400 400" role="img" aria-label="${o.name} ֆունկցիայի գրաֆիկ"></svg><div class="live"></div>
+ ${o.P.map(a=>`<label>${a[0]}<input type="range" min="${a[1]}" max="${a[2]}" step="0.1" value="${a[3]}" data-k="${a[0]}"><span></span></label>`).join('')}</div></div></section>`);
+ const sec=document.getElementById(o.id),svg=sec.querySelector('svg'),live=sec.querySelector('.live');
+ const fr=frame(400,400,10);
+ const draw=()=>{svg.innerHTML=fr.s+`<path d="${path(o.f,p,fr.X,fr.Y)}" fill="none" stroke="${o.c}" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+  live.textContent=o.live(p);sec.querySelectorAll('input').forEach(i=>i.nextElementSibling.textContent=n(i.value))};
+ sec.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{p[i.dataset.k]=+i.value;draw()}));
+ draw();
+});
+/* hero: curves draw themselves one after another */
+const hs=document.getElementById('hero'),hf=frame(400,300,10),ht=document.getElementById('htag');
+hs.innerHTML=hf.s;let hi=0;
+const dp={k:1,b:0,a:1,c:0};
+function show(){const o=F[hi%6],q={k:1,b:0,a:1,c:0};if(o.id==='quad'){q.a=.5;q.b=0;q.c=-4}if(o.id==='inv')q.k=6;if(o.id==='linear'){q.k=1.5;q.b=-2}
+ hs.querySelectorAll('path').forEach(e=>e.remove());
+ const e=document.createElementNS(NS,'path');e.setAttribute('d',path(o.f,q,hf.X,hf.Y));e.setAttribute('fill','none');e.setAttribute('stroke',o.c);e.setAttribute('stroke-width','4');e.setAttribute('stroke-linecap','round');
+ hs.appendChild(e);ht.textContent=o.name+' · '+o.formula;ht.style.borderColor=o.c;
+ if(!matchMedia('(prefers-reduced-motion:reduce)').matches&&e.getTotalLength){const L=e.getTotalLength();e.style.strokeDasharray=L;e.style.strokeDashoffset=L;e.getBoundingClientRect();e.style.transition='stroke-dashoffset 1.6s ease';e.style.strokeDashoffset=0}
+ hi++}
+show();setInterval(show,3200);
+</script>
+</body>
+</html>
